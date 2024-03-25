@@ -1,25 +1,26 @@
-from taipy.gui import Gui
-from math import cos, exp
+from taipy.gui import Gui, Markdown
+from pages.page1 import page1_md
+from pages.page2 import page2_md
 
-value = 10
 
-page = """
-# Taipy *Getting Started*
+nav = [
+    ('/taipy', 'Taipy'),
+    ('/embetter', 'Embetter'),
+    ('https://stock-visualization.taipy.cloud/', 'Demo')
+]
 
-Value: <|{value}|text|>
-
-<|{value}|slider|on_change=on_slider|>
-
-<|{data}|chart|>
+root_md = """
+<|navbar|lov={nav}|>
 """
 
-def on_slider(state):
-    state.data = compute_data(state.value)
 
-def compute_data(decay:int)->list:
-    return [cos(i/6) * exp(-i*decay/600) for i in range(100)]
+pages = {
+    "/": Markdown(root_md),
+    "taipy": page1_md,
+    "embetter": page2_md,
+}
 
-data = compute_data(value)
+
 
 if __name__ == "__main__":
-    Gui(page).run(title="Dynamic chart")
+    Gui(pages=pages, css_file='main.css').run(title="Taipy + Embetter", debug=True)
