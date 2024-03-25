@@ -1,19 +1,23 @@
 from taipy.gui import Markdown
+import taipy as tp
 from pathlib import Path
+from sc_config import scenario_cfg
+import joblib
 
-import numpy as np
-import pandas as pd
-from embetter.grab import ColumnGrabber
-from embetter.multi import ClipEncoder
-from embetter.text import SentenceEncoder
-from embetter.vision import ImageLoader
-from sklearn.linear_model import (LogisticRegression, Perceptron,
-                                  QuantileRegressor)
-from sklearn.model_selection import cross_val_score
-from sklearn.pipeline import make_pipeline
+data = joblib.load('data.pkl')
+sentence = 'The quick brown fox jumps over the lazy dog'
+
+scenario = tp.create_scenario(scenario_cfg)
+scenario.sentences.write(data)
+scenario.sentence_to_predict.write(sentence)
+
+tp.submit(scenario)
 
 
-
+def save(state):
+    state.scenario.sentences.write(data)
+    state.scenario.sentence_to_predict.write(state.sentence)
+    state.refresh('scenario')
 
 
 page2_md = Markdown(
@@ -26,21 +30,19 @@ page2_md = Markdown(
 > It should make it very easy to quickly build proof of concepts using scikit-learn pipelines and, in particular, should help with bulk labelling. 
 > It's a also meant to play nice with bulk and scikit-partial but it can also be used together with your favorite ANN solution like weaviate, chromadb and hnswlib.*
 
-```python
-rura_img = make_pipeline(
-    ImageLoader(convert="RGB"),
-    ClipEncoder(),
-)
+Mamy dwa typy embeddingów:
+    - Tekstowe
+    - Obrazkowe
 
-rura_text = make_pipeline(
-    ColumnGrabber("text"),
-    SentenceEncoder()
-)
-rura_text2 = make_pipeline(
-    ColumnGrabber("Text"),
-    SentenceEncoder()
-)
-```
+
+<|{scenario}|scenario|>
+<|{scenario}|scenario_dag|>
+
+<|{sentence}|>
+
+<|{sentence}|input|on_change=save|active={scenario}|>
+
+<|{scenario.prediction}|data_node|>
 
 """
 )

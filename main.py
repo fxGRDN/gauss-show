@@ -1,4 +1,5 @@
 from taipy.gui import Gui, Markdown
+import taipy as tp
 from pages.page1 import page1_md
 from pages.page2 import page2_md
 
@@ -23,4 +24,5 @@ pages = {
 
 
 if __name__ == "__main__":
-    Gui(pages=pages, css_file='main.css').run(title="Taipy + Embetter", debug=True)
+    tp.Core().run()
+    Gui(pages=pages, css_file='main.css').run(title="Taipy + Embetter")
